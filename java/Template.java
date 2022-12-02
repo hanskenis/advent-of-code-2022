@@ -2,9 +2,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * Day01
- */
 public class Template {
 
     public Template(List<String> input) {
