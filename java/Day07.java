@@ -1,3 +1,4 @@
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -8,9 +9,11 @@ public class Day07 {
         String name;
         List<TreeNode> children;
         TreeNode parent;
+        int totalSize;
 
         public TreeNode(int size, String name) {
             this.size = size;
+            this.totalSize = size;
             this.name = name;
             this.children = new ArrayList<>();
         }
@@ -21,9 +24,11 @@ public class Day07 {
         }
 
         public int totalSize() {
-            return this.children.stream().mapToInt(x -> x.totalSize()).sum() + this.size;
+            if (totalSize != 0)
+                return totalSize;
+            totalSize = this.children.stream().mapToInt(x -> x.totalSize()).sum() + this.size;
+            return totalSize;
         }
-
     }
 
     TreeNode root = new TreeNode(0, "/");
@@ -52,19 +57,51 @@ public class Day07 {
         }
     }
 
+    private TreeNode dirChild(TreeNode node) {
+        for (TreeNode childNode : node.children) {
+            if (childNode.totalSize == 0) {
+                return childNode;
+            }
+        }
+        return null;
+
+    }
+
+    private TreeNode nextNode(TreeNode node) {
+        var currentNode = node;
+        TreeNode dir = dirChild(node);
+        while (dir != null) {
+            currentNode = dir;
+            dir = dirChild(currentNode);
+        }
+
+        return currentNode;
+    }
+
+    public void traverse() {
+        var currentNode = nextNode(root);
+
+        while (currentNode != root) {
+            currentNode.totalSize();
+            currentNode = currentNode.parent;
+        }
+    }
+
     private int part1() {
+        traverse();
+        System.out.println("Starting part 1...");
+
         var total = 0;
-        List<TreeNode> nodesTodo = new ArrayList<TreeNode>();
+        ArrayDeque<TreeNode> nodesTodo = new ArrayDeque<TreeNode>();
         nodesTodo.add(root);
         List<TreeNode> nodesDone = new ArrayList<TreeNode>();
         while (!nodesTodo.isEmpty()) {
-            var currentNode = nodesTodo.remove(0);
+            var currentNode = nodesTodo.pop();
             var nodeTotal = currentNode.totalSize();
             if (nodeTotal > 0 && nodeTotal <= 100000 && currentNode.size == 0) {
                 total += nodeTotal;
             }
             nodesDone.add(currentNode);
-
             for (var child : currentNode.children) {
                 if (!nodesDone.contains(child)) {
                     nodesTodo.add(child);
