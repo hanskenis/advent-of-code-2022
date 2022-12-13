@@ -82,6 +82,9 @@ public class Day12 {
             var current = next.remove(0);
             var neighbors = neighbors(current, height(current[0], current[1]));
             for (var neighbor : neighbors) {
+                if (map.get(neighbor[0]).get(neighbor[1]).equals('E'))
+                    return dist.get(current[0]).get(current[1]) + 1;
+
                 if (dist.get(neighbor[0]).get(neighbor[1]) > dist.get(current[0]).get(current[1]) + 1) {
                     dist.get(neighbor[0]).set(neighbor[1], dist.get(current[0]).get(current[1]) + 1);
                     next.add(neighbor);
