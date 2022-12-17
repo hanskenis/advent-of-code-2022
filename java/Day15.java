@@ -202,19 +202,6 @@ public class Day15 {
 
     }
 
-    private int part2() {
-        var high = 4000000;
-        for (int x = 0; x < high; x++) {
-            for (int y = 0; y < high; y++) {
-                var point = new Point(x, y);
-                if (!canHaveBeacon(point)) {
-                }
-            }
-        }
-
-        return node.p.x * 4000000 + node.p.y;
-    }
-
     public static void main(String[] args) {
         var scanner = new Scanner(System.in);
         List<String> data = new ArrayList<>();
