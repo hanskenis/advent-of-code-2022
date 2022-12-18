@@ -24,10 +24,8 @@ public class Template {
             data.add(scanner.nextLine());
         }
 
-        var day = new Template(data);
-
-        System.out.println("Part 1: " + day.part1());
-        System.out.println("Part 2: " + day.part2());
+        System.out.println("Part 1: " + new Template(data).part1());
+        System.out.println("Part 2: " + new Template(data).part2());
 
         scanner.close();
     }

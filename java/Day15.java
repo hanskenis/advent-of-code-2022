@@ -210,7 +210,7 @@ public class Day15 {
         }
 
         System.out.println("Part 1: " + new Day15(data).part1());
-        System.out.println("Part 2: " + new Day15(data).part2());
+        // System.out.println("Part 2: " + new Day15(data).part2());
 
         scanner.close();
     }
