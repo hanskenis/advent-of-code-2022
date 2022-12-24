@@ -3,7 +3,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -89,6 +88,10 @@ public class Day15 {
         return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
     }
 
+    int manhattenDistance(Point a, int x, int y) {
+        return Math.abs(a.x - x) + Math.abs(a.y - y);
+    }
+
     Point parseSensor(String sensor) {
         sensor = sensor.replace("Sensor at ", "");
         var splitted = sensor.split(",");
@@ -115,6 +118,7 @@ public class Day15 {
     }
 
     private int part1() {
+        // var y = 10;
         var y = 2000000;
         var result = 0;
         for (int i = topLeft.x - maxDist; i < bottomRight.x + maxDist; i++) {
@@ -128,78 +132,70 @@ public class Day15 {
 
     }
 
-    private int scanners(Point p) {
-        var scanners = 0;
+    private boolean hasScanners(int x, int y, Point ignore) {
         for (var entry : distances.entrySet()) {
-            if (manhattenDistance(entry.getKey(), p) <= entry.getValue()) {
-                scanners++;
+            if (entry != ignore && manhattenDistance(entry.getKey(), x, y) <= entry.getValue()) {
+                return true;
             }
         }
 
-        return scanners;
+        return false;
     }
 
-    class Node {
-        Point p;
-        int scanners;
-
-        Node(Point p, int scanners) {
-            this.p = p;
-            this.scanners = scanners;
-        }
-
+    boolean inRange(int x, int y, int max) {
+        return x >= 0 && x < max && y >= 0 && y < max;
     }
 
-    private List<int[]> delta(Node n) {
-        var result = new ArrayList<int[]>();
+    boolean found(int x, int y, int max, Point ignore) {
+        return inRange(x, y, max) && !hasScanners(x, y, ignore) && !beacons.contains(new Point(x, y));
+    }
+
+    private long part2() {
+        // var max = 20;
+        int max = 4000000;
         for (var entry : distances.entrySet()) {
-
-        }
-        return result;
-    }
-
-    private List<Node> children(Node node, int max, Set<Point> handled) {
-        var result = new ArrayList<Node>();
-        var delta = delta(node);
-        for (int[] d : delta) {
-            if (node.p.x + d[0] < 0 || node.p.x + d[0] > max || node.p.y + d[1] < 0 || node.p.y + d[1] > max) {
-                continue;
-            }
-            Point p = new Point(node.p.x + d[0], node.p.y + d[1]);
-            if (handled.contains(p)) {
-                continue;
-            }
-            int s = scanners(p);
-            result.add(new Node(p, s));
-        }
-
-        return result;
-    }
-
-    private int part2_temp() {
-        // int high = 4000000;
-        int high = 20;
-        Point p = new Point(high / 2, high / 2);
-        var scanners = scanners(p);
-        var node = new Node(p, scanners);
-        PriorityQueue<Node> queue = new PriorityQueue<>((a, b) -> a.scanners - b.scanners);
-        Set<Point> handled = new HashSet<>();
-
-        while (node.scanners != 0) {
-            var children = children(node, high, handled);
-            for (var child : children) {
-                if (!handled.contains(child.p)) {
-                    queue.add(child);
+            var scanner = entry.getKey();
+            var dist = entry.getValue();
+            int x = scanner.x + dist + 1;
+            int y = scanner.y;
+            while (x != scanner.x && y != scanner.y) {
+                if (found(x, y, max, scanner)) {
+                    return x * 4000000L + y;
                 }
+                x--;
+                y--;
             }
 
-            handled.add(node.p);
-            node = queue.poll();
+            x = scanner.x;
+            y = scanner.y - dist - 1;
+            while (x != scanner.x - dist - 1 && y != scanner.y) {
+                if (found(x, y, max, scanner)) {
+                    return x * 4000000L + y;
+                }
+                x--;
+                y++;
+            }
 
+            x = scanner.x - dist - 1;
+            y = scanner.y;
+            while (x != scanner.x && y != scanner.y + dist + 1) {
+                if (found(x, y, max, scanner)) {
+                    return x * 4000000L + y;
+                }
+                x++;
+                y++;
+            }
+            x = scanner.x;
+            y = scanner.y + dist + 1;
+            while (x != scanner.x + dist + 1 && y != scanner.y) {
+                if (found(x, y, max, scanner)) {
+                    return x * 4000000L + y;
+                }
+                x++;
+                y--;
+            }
         }
-
-        return node.p.x * 4000000 + node.p.y;
-
+        return 0;
     }
 
     public static void main(String[] args) {
@@ -210,7 +206,7 @@ public class Day15 {
         }
 
         System.out.println("Part 1: " + new Day15(data).part1());
-        // System.out.println("Part 2: " + new Day15(data).part2());
+        System.out.println("Part 2: " + new Day15(data).part2());
 
         scanner.close();
     }
